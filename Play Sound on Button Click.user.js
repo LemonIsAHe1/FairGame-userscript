@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         Play Sound on Button Click
+// @name         Play Sound on Button Click with Movable GUI
 // @namespace    http://your.namespace.here
-// @version      0.6
-// @description  Play a sound when a button is clickable
-// @author       LemonIsAHe
+// @version      0.7
+// @description  Play a sound when a button is clickable with GUI
+// @author       Your Name
 // @match        https://fair.kaliburg.de/*
 // @grant        none
 // ==/UserScript==
@@ -57,7 +57,7 @@
     guiContainer.style.cursor = 'move';
     guiContainer.draggable = true;
     guiContainer.style.display = 'none'; // Initially hide the GUI
-    guiContainer.style.zIndex = '9999';
+    guiContainer.style.zIndex = '9999'; // Set a high z-index value
 
     const guiTitle = document.createElement('div');
     guiTitle.innerHTML = '<strong>Sound Player</strong>';
@@ -82,6 +82,26 @@
 
     statusContainer.appendChild(statusText);
     guiContainer.appendChild(statusContainer);
+
+    const refreshContainer = document.createElement('div');
+    refreshContainer.style.marginBottom = '8px';
+
+    const refreshLabel = document.createElement('label');
+    refreshLabel.innerHTML = 'Refresh Time (seconds): ';
+
+    const refreshSlider = document.createElement('input');
+    refreshSlider.type = 'range';
+    refreshSlider.min = '1';
+    refreshSlider.max = '60';
+    refreshSlider.value = '5';
+    refreshSlider.addEventListener('input', () => {
+        clearInterval(refreshInterval);
+        refreshInterval = setInterval(updateStatus, refreshSlider.value * 1000);
+    });
+
+    refreshLabel.appendChild(refreshSlider);
+    refreshContainer.appendChild(refreshLabel);
+    guiContainer.appendChild(refreshContainer);
 
     document.body.appendChild(guiContainer);
 
@@ -117,24 +137,11 @@
         const multiStatus = multiButton ? (multiButton.disabled ? 'Disabled' : 'Enabled') : 'Not Found';
 
         statusText.innerHTML = `Bias Button: ${biasStatus}<br>Multi Button: ${multiStatus}`;
-
-        // Play sound if Bias Button is enabled
-        if (biasButton && !biasButton.disabled) {
-            playSound();
-        }
     }
 
     // Initial status update
     updateStatus();
 
-    // Schedule periodic status updates
-    setInterval(updateStatus, 5000); // Update every 5 seconds
-
-    // Toggle GUI visibility on "Ctrl+[" key combination
-    document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === '[') {
-            guiContainer.style.display = guiContainer.style.display === 'none' ?
-                'block' : 'none';
-        }
-    });
+    // Set up a refresh interval
+    let refreshInterval = setInterval(updateStatus, refreshSlider.value * 1000); // Update every 5 seconds initially
 })();
