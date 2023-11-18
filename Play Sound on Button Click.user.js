@@ -57,6 +57,7 @@
     guiContainer.style.cursor = 'move';
     guiContainer.draggable = true;
     guiContainer.style.display = 'none'; // Initially hide the GUI
+    guiContainer.style.zIndex = '9999';
 
     const guiTitle = document.createElement('div');
     guiTitle.innerHTML = '<strong>Sound Player</strong>';
